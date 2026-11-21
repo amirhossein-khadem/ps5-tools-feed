@@ -1,0 +1,31 @@
+{
+  "name": "Manual Tools - Official Releases",
+  "payloads": [
+    {
+      "id": "ps5-account-tools",
+      "name": "PS5 Account Tools",
+      "filename": "ps5-account-tools-v1.2.elf",
+      "url": "https://github.com/MangoScango/ps5-account-tools/releases/download/v1.2/ps5-account-tools-v1.2.elf",
+      "checksum": "2e1402d8c088afda55280b28fcc66ccb870528ec948d10ea586088f60f723f2a",
+      "version": "v1.2",
+      "last_update": "2026-09-19",
+      "category": "Utilities & Tools",
+      "author": "MangoScango",
+      "source": "https://github.com/MangoScango/ps5-account-tools/releases",
+      "description": "Release metadata from the publisher."
+    },
+    {
+      "id": "fc27-squad-updater",
+      "name": "FC27 Squad Updater",
+      "filename": "fc27-squad-updater.elf",
+      "url": "https://github.com/imanrep/fc27squadupdater/releases/download/v1.0/fc27-squad-updater.elf",
+      "checksum": "0ca38daa887d98dba6ff03a0cdf7935ef5d4f13f4fc14dbea9c3d4a3a704c76b",
+      "version": "v1.0",
+      "last_update": "2026-10-04",
+      "category": "Utilities & Tools",
+      "author": "imanrep",
+      "source": "https://github.com/imanrep/fc27squadupdater/releases",
+      "description": "Release metadata from the publisher."
+    }
+  ]
+}
