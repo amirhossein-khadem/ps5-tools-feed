@@ -1,0 +1,34 @@
+name: Check publisher releases
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/refresh.mjs'
+      - '.github/workflows/refresh-catalog.yml'
+
+concurrency: refresh-payload-catalog
+
+jobs:
+  refresh:
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Verify both publishers
+        run: node scripts/refresh.mjs
+      - name: Publish the catalog
+        run: |
+          if git diff --quiet -- payloads.json; then
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- payloads.json
+          git commit -m 'Refresh verified publisher releases'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
