@@ -8,7 +8,7 @@ Public release catalog for PS5 Account Tools and FC27 Squad Updater.
 1. Identify the publisher's official GitHub repository and confirm which `.elf` asset belongs to the payload. Use the exact spelling shown on the publisher's Releases page.
 2. Add an object to [publishers.json](publishers.json) with the fields below. Use a new ID and keep it for every version of the same payload. The existing entries show the complete configuration for a stable publisher.
 3. Run `node --test` and then `node scripts/refresh.mjs --check` with Node.js. The second command queries the publisher and reports each verification result without writing the catalog. Confirm that the new ID reports `Verified` before committing.
-4. Commit and push the change to the default branch. The workflow tests the configuration and publishes the verified entry into `payloads.json`. Check the workflow log before using the catalog. Normal scheduled checks run at minute 17 every six hours (UTC).
+4. Commit and push the change to the default branch. The workflow tests the configuration and publishes the verified entry into `payloads.json`. Check the workflow log before using the catalog. Scheduled checks run every 30 minutes, at minutes 17 and 47 of each hour (UTC).
 
 | Field | Value |
 | --- | --- |
