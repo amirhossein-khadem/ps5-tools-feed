@@ -1,0 +1,32 @@
+[
+  {
+    "id": "ps5-account-tools",
+    "name": "PS5 Account Tools",
+    "repository": "MangoScango/ps5-account-tools",
+    "assetNames": [
+      "ps5-account-tools.elf",
+      "ps5-account-tools-v{version}.elf",
+      "ps5-account-tools-{version}.elf"
+    ],
+    "releasePolicy": "stable",
+    "versionScheme": "numeric",
+    "category": "Utilities & Tools",
+    "author": "MangoScango",
+    "description": "Release metadata from the publisher."
+  },
+  {
+    "id": "fc27-squad-updater",
+    "name": "FC27 Squad Updater",
+    "repository": "imanrep/fc27squadupdater",
+    "assetNames": [
+      "fc27-squad-updater.elf",
+      "fc27-squad-updater-v{version}.elf",
+      "fc27-squad-updater-{version}.elf"
+    ],
+    "releasePolicy": "stable",
+    "versionScheme": "numeric",
+    "category": "Utilities & Tools",
+    "author": "imanrep",
+    "description": "Release metadata from the publisher."
+  }
+]

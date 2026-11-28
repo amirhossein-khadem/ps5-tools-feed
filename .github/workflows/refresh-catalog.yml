@@ -6,7 +6,9 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'scripts/refresh.mjs'
+      - 'publishers.json'
+      - 'scripts/**'
+      - 'test/**'
       - '.github/workflows/refresh-catalog.yml'
 
 concurrency: refresh-payload-catalog
@@ -20,7 +22,9 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
-      - name: Verify both publishers
+      - name: Test release selection and integrity
+        run: node --test
+      - name: Verify publisher releases
         run: node scripts/refresh.mjs
       - name: Publish the catalog
         run: |
