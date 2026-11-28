@@ -34,7 +34,9 @@ const [original, config] = await Promise.all([
   readFile(configFile, "utf8"),
 ]);
 const previous = JSON.parse(original);
-const { catalog, results } = await refreshCatalog(previous, JSON.parse(config));
+const { catalog, results } = await refreshCatalog(previous, JSON.parse(config), {
+  githubToken: process.env.GITHUB_TOKEN,
+});
 const failures = results.filter(({ status }) => status === "rejected");
 for (const result of results) {
   if (result.status === "fulfilled") {

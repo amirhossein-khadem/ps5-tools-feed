@@ -197,9 +197,15 @@ test("manual approval hashes the ELF, records its source and wins over an older 
   const calls = [];
   const output = await refreshCatalog(catalog, [{ ...stable, manualRelease: approved }], {
     now,
+    githubToken: "test-token",
     fetcher: async (url, options) => {
       calls.push(url);
-      if (url.endsWith("/latest")) return Response.json(stableRelease);
+      if (url.endsWith("/latest")) {
+        assert.equal(options.headers.Authorization, "Bearer test-token");
+        assert.equal(options.redirect, "error");
+        return Response.json(stableRelease);
+      }
+      assert.equal(options.headers?.Authorization, undefined);
       assert.equal(options.redirect, "manual");
       if (url === approved.url) {
         return new Response(null, { status: 302, headers: { Location: "/file.elf" } });

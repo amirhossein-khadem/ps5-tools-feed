@@ -100,22 +100,27 @@ function matchingAssets(release, publisher) {
   return release.assets.filter((asset) => names.has(asset?.name));
 }
 
-async function requestGitHub(url, fetcher) {
+async function requestGitHub(url, fetcher, token) {
+  const headers = { Accept: "application/vnd.github+json", "User-Agent": "PS5-Tools-Feed/1.0" };
+  if (token) headers.Authorization = `Bearer ${token}`;
   const response = await fetcher(url, {
-    headers: { Accept: "application/vnd.github+json", "User-Agent": "PS5-Tools-Feed/1.0" },
+    headers,
     redirect: "error",
     signal: AbortSignal.timeout(15000),
   });
-  if (!response.ok) throw new Error(`GitHub returned HTTP ${response.status}`);
+  if (!response.ok) {
+    const rateLimit = response.headers.get("x-ratelimit-remaining") === "0";
+    throw new Error(`GitHub returned HTTP ${response.status}${rateLimit ? " (rate limit exhausted)" : ""}`);
+  }
   return response;
 }
 
-async function latestPrerelease(endpoint, publisher, fetcher) {
+async function latestPrerelease(endpoint, publisher, githubRequest) {
   const eligible = [];
   let response;
   let page = 1;
   do {
-    response = await requestGitHub(`${endpoint}?per_page=100&page=${page++}`, fetcher);
+    response = await githubRequest(`${endpoint}?per_page=100&page=${page++}`);
     const releases = await response.json();
     if (!Array.isArray(releases)) throw new Error("Invalid GitHub release list");
     eligible.push(...releases.filter((release) =>
@@ -131,12 +136,12 @@ async function latestPrerelease(endpoint, publisher, fetcher) {
   return eligible[0];
 }
 
-async function officialRelease(publisher, fetcher) {
+async function officialRelease(publisher, githubRequest) {
   const { repository, releasePolicy } = publisher;
   const endpoint = `https://api.github.com/repos/${repository}/releases`;
   const release = releasePolicy === "stable"
-    ? await (await requestGitHub(`${endpoint}/latest`, fetcher)).json()
-    : await latestPrerelease(endpoint, publisher, fetcher);
+    ? await (await githubRequest(`${endpoint}/latest`)).json()
+    : await latestPrerelease(endpoint, publisher, githubRequest);
   if (release?.draft !== false || release.prerelease !== (releasePolicy === "prerelease") ||
       !isAllowedTag(release.tag_name, publisher)) {
     throw new Error(`No valid ${releasePolicy} release`);
@@ -205,11 +210,11 @@ async function verifyManualDownload(candidate, fetcher) {
   if (hash.digest("hex") !== candidate.checksum) throw new Error("Manual download SHA-256 mismatch");
 }
 
-async function refreshPublisher(publisher, previous, fetcher) {
+async function refreshPublisher(publisher, previous, githubRequest, fetcher) {
   const manual = manualRelease(publisher);
   let official;
   try {
-    official = await officialRelease(publisher, fetcher);
+    official = await officialRelease(publisher, githubRequest);
   } catch (error) {
     if (!manual) throw error;
   }
@@ -238,13 +243,15 @@ async function refreshPublisher(publisher, previous, fetcher) {
 
 export async function refreshCatalog(previous, settings, {
   fetcher = globalThis.fetch,
+  githubToken,
   now = new Date(),
 } = {}) {
   const publishers = publisherIndex(settings);
   const verified = catalogIndex(previous, publishers);
   const ids = [...new Set([...verified.keys(), ...publishers.keys()])];
+  const githubRequest = (url) => requestGitHub(url, fetcher, githubToken);
   const results = await Promise.allSettled(ids.map((id) =>
-    refreshPublisher(publishers.get(id), verified.get(id), fetcher)));
+    refreshPublisher(publishers.get(id), verified.get(id), githubRequest, fetcher)));
 
   const payloads = results.map((result, index) => result.status === "fulfilled"
     ? result.value

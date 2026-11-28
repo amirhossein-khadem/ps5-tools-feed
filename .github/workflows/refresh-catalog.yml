@@ -25,6 +25,8 @@ jobs:
       - name: Test release selection and integrity
         run: node --test
       - name: Verify publisher releases
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: node scripts/refresh.mjs
       - name: Publish the catalog
         run: |
